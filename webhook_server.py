@@ -16,8 +16,12 @@ from aiogram.utils.executor import start_webhook
 import os
 from db import db, User
 
-API_TOKEN = os.getenv("API_TOKEN")
+from flask import Flask
 
+API_TOKEN = os.getenv("API_TOKEN")
+PORT = os.getenv("PORT", 8888)
+
+logging.info(PORT)
 # webhook settings
 WEBHOOK_HOST = os.getenv("WEBHOOK_HOST") if os.getenv("WEBHOOK_HOST") else 'https://d326e307c747.ngrok.io'
 WEBHOOK_PATH = '/api/bot/webhook'
@@ -34,6 +38,17 @@ bot = Bot(token=API_TOKEN)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 dp.middleware.setup(LoggingMiddleware())
+
+# Instance flask server to return frontend and check health
+app = Flask(__name__)
+
+APP_VERSION = 0.1
+
+
+@app.route('/')
+def hello_world():
+    return f'Eu sou o Seeds Gratidaum Bot e tenho {APP_VERSION} anos de idade.'
+
 
 
 # States
@@ -131,6 +146,7 @@ async def start(message: types.Message):
     except Exception as e:
         db_close()
         logging.error(traceback.format_exc())
+
 
 # @dp.message_handler(state=Form.name)
 # async def process_name(message: types.Message, state: FSMContext):
@@ -305,6 +321,7 @@ async def on_shutdown(dp):
 
 
 if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=PORT)
     start_webhook(
         dispatcher=dp,
         webhook_path=WEBHOOK_PATH,
