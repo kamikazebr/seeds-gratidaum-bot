@@ -147,19 +147,8 @@ async def start(message: types.Message):
         logging.error(traceback.format_exc())
 
 
-# @dp.message_handler(state=Form.name)
-# async def process_name(message: types.Message, state: FSMContext):
-#     """
-#     Process user name
-#     """
-#     async with state.proxy() as data:
-#         data['name'] = message.text
-#
-#     await Form.next()
-#     await message.reply("Qual seu username do SEEDS?")
 
-
-# Check age. Age gotta be digit
+# Check username.
 @dp.message_handler(lambda message: not message.text.isalnum(), state=Form.username)
 async def process_username_invalid(message: types.Message):
     """
