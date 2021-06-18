@@ -19,9 +19,8 @@ from db import db, User
 from flask import Flask
 
 API_TOKEN = os.getenv("API_TOKEN")
-PORT = os.getenv("PORT", 8888)
 
-logging.info(PORT)
+# logging.info(PORT)
 # webhook settings
 WEBHOOK_HOST = os.getenv("WEBHOOK_HOST") if os.getenv("WEBHOOK_HOST") else 'https://d326e307c747.ngrok.io'
 WEBHOOK_PATH = '/api/bot/webhook'
@@ -29,7 +28,7 @@ WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
 
 # webserver settings
 WEBAPP_HOST = os.getenv("WEBAPP_HOST") if os.getenv("WEBAPP_HOST") else 'localhost'  # or ip
-WEBAPP_PORT = os.getenv("WEBAPP_PORT") if os.getenv("WEBAPP_PORT") else 3001
+WEBAPP_PORT = os.getenv("PORT", 3001)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -40,14 +39,14 @@ dp = Dispatcher(bot, storage=storage)
 dp.middleware.setup(LoggingMiddleware())
 
 # Instance flask server to return frontend and check health
-app = Flask(__name__)
+# app = Flask(__name__)
 
-APP_VERSION = 0.1
+# APP_VERSION = 0.1
 
 
-@app.route('/')
-def hello_world():
-    return f'Eu sou o Seeds Gratidaum Bot e tenho {APP_VERSION} anos de idade.'
+# @app.route('/')
+# def hello_world():
+#     return f'Eu sou o Seeds Gratidaum Bot e tenho {APP_VERSION} anos de idade.'
 
 
 
@@ -321,7 +320,7 @@ async def on_shutdown(dp):
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=PORT)
+    # app.run(host="0.0.0.0", port=PORT)
     start_webhook(
         dispatcher=dp,
         webhook_path=WEBHOOK_PATH,
