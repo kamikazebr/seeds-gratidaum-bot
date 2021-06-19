@@ -20,6 +20,11 @@ from aiohttp import web
 
 from db import db, User
 
+
+logging.basicConfig(level=logging.INFO)
+
+APP_VERSION = 0.3
+
 API_TOKEN = os.getenv("API_TOKEN")
 
 # logging.info(PORT)
@@ -29,10 +34,10 @@ WEBHOOK_PATH = '/api/bot/webhook'
 WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
 
 # webserver settings
-WEBAPP_HOST = os.getenv("WEBAPP_HOST") if os.getenv("WEBAPP_HOST") else 'localhost'  # or ip
+WEBAPP_HOST = os.getenv("WEBAPP_HOST") if os.getenv("WEBAPP_HOST") else '0.0.0.0'  # or ip
 WEBAPP_PORT = os.getenv("PORT", 3001)
 
-logging.basicConfig(level=logging.INFO)
+logging.info(f"Port to listen: {WEBAPP_PORT}")
 
 bot = Bot(token=API_TOKEN)
 # For example use simple MemoryStorage for Dispatcher.
@@ -42,8 +47,6 @@ dp.middleware.setup(LoggingMiddleware())
 
 # Instance flask server to return frontend and check health
 # app = Flask(__name__)
-
-APP_VERSION = 0.2
 
 
 # @app.route('/')
