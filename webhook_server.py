@@ -4,7 +4,6 @@ import logging
 
 import aiogram.utils.markdown as md
 import peewee
-from aiogram.dispatcher.filters import ChatTypeFilter
 from aiogram.dispatcher.webhook import DEFAULT_ROUTE_NAME
 from aiogram.utils.deep_linking import get_start_link
 
@@ -13,7 +12,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
 from aiogram.dispatcher import Dispatcher, FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
-from aiogram.types import ParseMode, ChatType
+from aiogram.types import ParseMode
 from aiogram.utils.executor import set_webhook
 import os
 
@@ -26,7 +25,10 @@ logging.basicConfig(level=logging.INFO)
 APP_VERSION = 0.3
 
 API_TOKEN = os.getenv("API_TOKEN")
+CHAT_ID_FATHER = os.getenv("CHAT_ID_FATHER", None)
 
+if not CHAT_ID_FATHER:
+    logging.warning(f"Chat ID FATHER is not present, check your CHAT_ID_FATHER env variables")
 # logging.info(PORT)
 # webhook settings
 WEBHOOK_HOST = os.getenv("WEBHOOK_HOST") if os.getenv("WEBHOOK_HOST") else 'https://e4972c9dbaa0.ngrok.io'
@@ -94,13 +96,40 @@ async def help_handler(message: types.Message):
         logging.error(e)
 
 
-# @dp.message_handler(ChatTypeFilter(ChatType.CHANNEL))
-# @dp.message_handler(ChatTypeFilter(ChatType.GROUP))
+async def send_msg_father(msg):
+    if CHAT_ID_FATHER:
+        await bot.send_message(chat_id=CHAT_ID_FATHER, text=msg)
+    else:
+        logging.info("CHAT_ID_FATHER env not defined in send_msg_father(). Do nothihg")
 
-# @dp.message_handler(commands=['start', 'borala', 'bora', 'começar'])
+
+@dp.my_chat_member_handler()
+async def some_handler(my_chat_member: types.ChatMemberUpdated):
+    logging.info(f"Chat member update: {my_chat_member}")
+
+    user = my_chat_member.new_chat_member.user
+    status = my_chat_member.new_chat_member.status
+    if user.is_bot:
+        if status == "member":
+            msg = f"'{my_chat_member.from_user.full_name}' adicionou o Bot no grupo '{my_chat_member.chat.title}'"
+            logging.info(msg)
+            await send_msg_father(msg)
+            # logging.info(f"Não me é permitido ficar aqui. Saindo do grupo")
+            # await my_chat_member.chat.leave()
+        elif status == "left":
+            msg = f"'{my_chat_member.from_user.full_name}' removeu o Bot do grupo '{my_chat_member.chat.title}'"
+            logging.info(msg)
+            await send_msg_father(msg)
+
+
 async def start_redirect_help(message: types.Message):
     logging.warning(f"Msg in group or channel. Calling Help {message}")
     await help_handler(message)
+
+
+@dp.message_handler(commands=['admin'])
+async def admin(message: types.Message):
+    logging.info(message)
 
 
 @dp.message_handler(commands=['start', 'borala', 'bora', 'começar'])
@@ -165,8 +194,6 @@ async def start(message: types.Message):
         db_close()
         logging.error(traceback.format_exc())
         logging.error(e)
-
-
 
 
 # Check username.
