@@ -4,6 +4,7 @@ import logging
 
 import aiogram.utils.markdown as md
 import peewee
+from aiogram.dispatcher.filters import ChatTypeFilter
 from aiogram.dispatcher.webhook import DEFAULT_ROUTE_NAME
 from aiogram.utils.deep_linking import get_start_link
 
@@ -20,7 +21,6 @@ from aiohttp import web
 
 from db import db, User
 
-
 logging.basicConfig(level=logging.INFO)
 
 APP_VERSION = 0.3
@@ -29,7 +29,7 @@ API_TOKEN = os.getenv("API_TOKEN")
 
 # logging.info(PORT)
 # webhook settings
-WEBHOOK_HOST = os.getenv("WEBHOOK_HOST") if os.getenv("WEBHOOK_HOST") else 'https://d326e307c747.ngrok.io'
+WEBHOOK_HOST = os.getenv("WEBHOOK_HOST") if os.getenv("WEBHOOK_HOST") else 'https://e4972c9dbaa0.ngrok.io'
 WEBHOOK_PATH = '/api/bot/webhook'
 WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
 
@@ -44,6 +44,7 @@ bot = Bot(token=API_TOKEN)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 dp.middleware.setup(LoggingMiddleware())
+
 
 # Instance flask server to return frontend and check health
 # app = Flask(__name__)
@@ -93,9 +94,22 @@ async def help_handler(message: types.Message):
         logging.error(e)
 
 
-@dp.message_handler(commands=['start', 'borala', 'bora', 'começar'], chat_types=[ChatType.PRIVATE])
+# @dp.message_handler(ChatTypeFilter(ChatType.CHANNEL))
+# @dp.message_handler(ChatTypeFilter(ChatType.GROUP))
+
+# @dp.message_handler(commands=['start', 'borala', 'bora', 'começar'])
+async def start_redirect_help(message: types.Message):
+    logging.warning(f"Msg in group or channel. Calling Help {message}")
+    await help_handler(message)
+
+
+@dp.message_handler(commands=['start', 'borala', 'bora', 'começar'])
 async def start(message: types.Message):
     try:
+        if message.chat.type != 'private':
+            await start_redirect_help(message)
+            return
+        logging.info(f"{message.chat.type}")
         logging.warning("Start")
         user = None
         # await Form.name.set()
@@ -151,6 +165,8 @@ async def start(message: types.Message):
         db_close()
         logging.error(traceback.format_exc())
         logging.error(e)
+
+
 
 
 # Check username.
