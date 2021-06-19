@@ -3,6 +3,7 @@ from ppretty import ppretty
 
 
 async def api_get(account, memo=''):
+    memo = memo if memo else ''
     json = {
         "actions": [
             {

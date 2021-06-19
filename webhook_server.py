@@ -306,7 +306,7 @@ async def ack(message: types.Message):
             has_user = User.get_or_none(name=who)
 
             if has_user:
-                msg = f"{message.from_user.get_mention()} envia Gratidaum para {who} - {memo}"
+                msg = f"{message.from_user.get_mention()} envia Gratidaum para {who} - {memo if memo else ''}"
                 # Reply to chat origin the Gratidaum sent
                 await bot.send_message(message.chat.id, msg, parse_mode=ParseMode.MARKDOWN)
                 logging.info(msg)
