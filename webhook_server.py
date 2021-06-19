@@ -18,6 +18,7 @@ import os
 
 from aiohttp import web
 
+from api import api_get
 from db import db, User
 
 logging.basicConfig(level=logging.INFO)
@@ -46,15 +47,6 @@ bot = Bot(token=API_TOKEN)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 dp.middleware.setup(LoggingMiddleware())
-
-
-# Instance flask server to return frontend and check health
-# app = Flask(__name__)
-
-
-# @app.route('/')
-# def hello_world():
-#     return f'Eu sou o Seeds Gratidaum Bot e tenho {APP_VERSION} anos de idade.'
 
 
 # States
@@ -127,9 +119,28 @@ async def start_redirect_help(message: types.Message):
     await help_handler(message)
 
 
+def build_qr_msg(json, to_who=None):
+    link_wallet = f'https://eosio.to/{json["esr"][6:]}'
+    to = to_who if to_who else 'a pessoa'
+    return \
+        f"🥳 Sua Gratidaum está quase chegando para {to} 🎉\n\n" \
+        f"Você precisa confirmar a transação.\n" \
+        f"Você tem 2 opções:\n\n" \
+        f'Clique no link abaixo para usar Seeds Wallet/Anchor\n' \
+        f'{md.hlink("Confirme o envio da Gratidaum", link_wallet)}\n\n' \
+        f'Ou\n\n' \
+        f"Escaneie o QR Code para confirmar a transação\n" \
+        f"{md.hide_link(json['qr'])}\n\n" \
+        f'Em casos de dúvidas digite /ajuda'
+
+
 @dp.message_handler(commands=['admin'])
 async def admin(message: types.Message):
-    logging.info(message)
+    try:
+        logging.info(f"admin: {message}")
+    except Exception as e:
+        logging.error(traceback.format_exc())
+        logging.error(f"error: {e}")
 
 
 @dp.message_handler(commands=['start', 'borala', 'bora', 'começar'])
@@ -272,7 +283,7 @@ async def process_username(message: types.Message, state: FSMContext):
 # await message.reply("Tudo certo!!\nAgora você já pode enviar Gratidaum!")
 
 
-@dp.message_handler(commands='ack')
+@dp.message_handler(commands=['ack', 'gratz'])
 async def ack(message: types.Message):
     try:
         # check if user is bot message.from_user.is_bot
@@ -298,9 +309,15 @@ async def ack(message: types.Message):
                 msg = f"{message.from_user.get_mention()} envia Gratidaum para {who} - {memo}"
                 # Reply to chat origin the Gratidaum sent
                 await bot.send_message(message.chat.id, msg, parse_mode=ParseMode.MARKDOWN)
-                # TODO CallAPI Hypha and create QRCODE and Link to sign transaction
-                await bot.send_message(message.from_user.id, msg, parse_mode=ParseMode.MARKDOWN)
                 logging.info(msg)
+                # CallAPI Hypha and create QRCODE and Link to sign transaction
+                json = await api_get(account=f"{has_user.username}", memo=memo)
+                logging.info(json)
+                res = build_qr_msg(json, who)
+                logging.info(res)
+                await bot.send_message(message.from_user.id, res, parse_mode=ParseMode.HTML,
+                                       disable_web_page_preview=False)
+
             else:
                 start_link_setup = await get_start_link('setup')
 
