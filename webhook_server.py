@@ -4,6 +4,7 @@ import logging
 
 import aiogram.utils.markdown as md
 import peewee
+from aiogram.dispatcher.webhook import DEFAULT_ROUTE_NAME
 from aiogram.utils.deep_linking import get_start_link
 
 from aiogram import Bot, types
@@ -12,11 +13,12 @@ from aiogram.contrib.middlewares.logging import LoggingMiddleware
 from aiogram.dispatcher import Dispatcher, FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.types import ParseMode
-from aiogram.utils.executor import start_webhook
+from aiogram.utils.executor import set_webhook
 import os
-from db import db, User
 
-from flask import Flask
+from aiohttp import web
+
+from db import db, User
 
 API_TOKEN = os.getenv("API_TOKEN")
 
@@ -41,13 +43,12 @@ dp.middleware.setup(LoggingMiddleware())
 # Instance flask server to return frontend and check health
 # app = Flask(__name__)
 
-# APP_VERSION = 0.1
+APP_VERSION = 0.2
 
 
 # @app.route('/')
 # def hello_world():
 #     return f'Eu sou o Seeds Gratidaum Bot e tenho {APP_VERSION} anos de idade.'
-
 
 
 # States
@@ -57,7 +58,7 @@ class Form(StatesGroup):
 
 
 @dp.message_handler(commands=['help', 'ajuda'])
-async def help(message: types.Message):
+async def help_handler(message: types.Message):
     try:
         logging.warning("Help")
 
@@ -86,6 +87,7 @@ async def help(message: types.Message):
     except Exception as e:
         db_close()
         logging.error(traceback.format_exc())
+        logging.error(e)
 
 
 @dp.message_handler(commands=['start', 'borala', 'bora', 'começar'])
@@ -145,7 +147,7 @@ async def start(message: types.Message):
     except Exception as e:
         db_close()
         logging.error(traceback.format_exc())
-
+        logging.error(e)
 
 
 # Check username.
@@ -156,7 +158,8 @@ async def process_username_invalid(message: types.Message):
     """
 
     return await message.reply(
-        "Oh Não! Isso não é um username válido. Vamos tentar novamente.\nQual seu username do SEEDS? (Ex: felipenseeds)")
+        "Oh Não! Isso não é um username válido. Vamos tentar novamente.\n"
+        "Qual seu username do SEEDS? (Ex: felipenseeds)")
 
 
 @dp.message_handler(lambda message: message.text.isalnum(), state=Form.username)
@@ -177,7 +180,6 @@ async def process_username(message: types.Message, state: FSMContext):
                         has_user.username = message.text
                         has_user.updated_date = datetime.now()
                         has_user.save()
-                        # updated = User.update({User.updated_date: datetime.now(), User.username: message.text}).execute()
                     else:
                         user_id = (User.insert(
                             name=name,
@@ -217,6 +219,7 @@ async def process_username(message: types.Message, state: FSMContext):
 
     except Exception as e:
         db_close()
+        logging.error(e)
         logging.error(traceback.format_exc())
 
 
@@ -270,6 +273,7 @@ async def ack(message: types.Message):
         # return SendMessage(message.chat.id, message.text)
     except Exception as e:
         db_close()
+        logging.error(e)
         logging.error(traceback.format_exc())
 
 
@@ -287,13 +291,13 @@ async def not_founded(message: types.Message):
     # return SendMessage(message.chat.id, message.text)
 
 
-async def on_startup(dp):
+async def on_startup_handler(_dpp):
     logging.warning('Startup..')
     await bot.set_webhook(WEBHOOK_URL)
     # insert code here to run it after start
 
 
-async def on_shutdown(dp):
+async def on_shutdown_handler(_dpp):
     logging.warning('Shutting down..')
 
     # insert code here to run it before shutdown
@@ -308,13 +312,57 @@ async def on_shutdown(dp):
     logging.warning('Bye!')
 
 
+async def root_path_handler(_request):
+    # name = request.match_info.get('name', "Anonymous")
+    return web.Response(text=f'Eu sou o Seeds Gratidaum Bot e tenho {APP_VERSION} anos de idade.')
+
+
+def start_webhook(dispatcher, webhook_path, *, loop=None, skip_updates=None,
+                  on_startup=None, on_shutdown=None, check_ip=False, retry_after=None, route_name=DEFAULT_ROUTE_NAME,
+                  **kwargs):
+    """
+    Start bot in webhook mode
+
+    :param retry_after:
+    :param dispatcher:
+    :param webhook_path:
+    :param loop:
+    :param skip_updates:
+    :param on_startup:
+    :param on_shutdown:
+    :param check_ip:
+    :param route_name:
+    :param kwargs:
+    :return:
+    """
+    executor = set_webhook(dispatcher=dispatcher,
+                           webhook_path=webhook_path,
+                           loop=loop,
+                           skip_updates=skip_updates,
+                           on_startup=on_startup,
+                           on_shutdown=on_shutdown,
+                           check_ip=check_ip,
+                           retry_after=retry_after,
+                           route_name=route_name)
+
+    # executor.web_app.router.add_route(method="GET",
+    #                                   path="/",
+    #                                   handler=root_path_handler,
+    #                                   name="root_handler")
+
+    executor.web_app.add_routes([web.get("/", root_path_handler)])
+
+    executor.run_app(**kwargs)
+
+
 if __name__ == '__main__':
     # app.run(host="0.0.0.0", port=PORT)
+
     start_webhook(
         dispatcher=dp,
         webhook_path=WEBHOOK_PATH,
-        on_startup=on_startup,
-        on_shutdown=on_shutdown,
+        on_startup=on_startup_handler,
+        on_shutdown=on_shutdown_handler,
         skip_updates=True,
         host=WEBAPP_HOST,
         port=WEBAPP_PORT,
