@@ -12,7 +12,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
 from aiogram.dispatcher import Dispatcher, FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
-from aiogram.types import ParseMode
+from aiogram.types import ParseMode, ChatType
 from aiogram.utils.executor import set_webhook
 import os
 
@@ -93,7 +93,7 @@ async def help_handler(message: types.Message):
         logging.error(e)
 
 
-@dp.message_handler(commands=['start', 'borala', 'bora', 'começar'])
+@dp.message_handler(commands=['start', 'borala', 'bora', 'começar'], chat_types=[ChatType.PRIVATE])
 async def start(message: types.Message):
     try:
         logging.warning("Start")
