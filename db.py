@@ -9,12 +9,19 @@ class BaseModel(Model):
         database = db
 
 
+class DBVersion(BaseModel):
+    number = AutoField()
+    created_date = DateTimeField(default=datetime.datetime.now())
+
+
 class User(BaseModel):
-    name = CharField(unique=True, primary_key=True)
+    pk_id = AutoField()
+    user_id = CharField()
+    name = CharField()
     username = CharField()
     created_date = DateTimeField()
     updated_date = DateTimeField()
 
 
-db.connect(reuse_if_open=True)
-db.create_tables([User])
+db.connect()
+db.create_tables([User, DBVersion])

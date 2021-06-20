@@ -1,9 +1,11 @@
 import traceback
 from datetime import datetime
 import logging
+from pathlib import Path
 
 import aiogram.utils.markdown as md
 import peewee
+from aiogram.contrib.middlewares.i18n import I18nMiddleware
 from aiogram.dispatcher.webhook import DEFAULT_ROUTE_NAME
 from aiogram.utils.deep_linking import get_start_link
 
@@ -12,27 +14,29 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
 from aiogram.dispatcher import Dispatcher, FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
-from aiogram.types import ParseMode
+from aiogram.types import ParseMode, MessageEntityType
 from aiogram.utils.executor import set_webhook
 import os
 
 from aiohttp import web
+from playhouse.shortcuts import model_to_dict
 
 from api import api_get
 from db import db, User
+from migrate import start_migration
 
 logging.basicConfig(level=logging.INFO)
 
-APP_VERSION = 0.3
+APP_VERSION = 0.4
 
 API_TOKEN = os.getenv("API_TOKEN")
 CHAT_ID_FATHER = os.getenv("CHAT_ID_FATHER", None)
 
 if not CHAT_ID_FATHER:
     logging.warning(f"Chat ID FATHER is not present, check your CHAT_ID_FATHER env variables")
-# logging.info(PORT)
+
 # webhook settings
-WEBHOOK_HOST = os.getenv("WEBHOOK_HOST") if os.getenv("WEBHOOK_HOST") else 'https://e4972c9dbaa0.ngrok.io'
+WEBHOOK_HOST = os.getenv("WEBHOOK_HOST") if os.getenv("WEBHOOK_HOST") else 'https://c2da1c477408.ngrok.io'
 WEBHOOK_PATH = '/api/bot/webhook'
 WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
 
@@ -42,11 +46,26 @@ WEBAPP_PORT = os.getenv("PORT", 3001)
 
 logging.info(f"Port to listen: {WEBAPP_PORT}")
 
+# Start migration
+start_migration()
+
 bot = Bot(token=API_TOKEN)
 # For example use simple MemoryStorage for Dispatcher.
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 dp.middleware.setup(LoggingMiddleware())
+
+I18N_DOMAIN = 'mybot'
+
+BASE_DIR = Path(__file__).parent
+LOCALES_DIR = BASE_DIR / 'locales'
+
+# Setup i18n middleware
+i18n = I18nMiddleware(I18N_DOMAIN, LOCALES_DIR)
+dp.middleware.setup(i18n)
+
+# Alias for gettext method
+_ = i18n.gettext
 
 
 # States
@@ -64,22 +83,16 @@ async def help_handler(message: types.Message):
 
         await bot.send_message(
             message.chat.id,
-            md.text(
-                md.text('Precisa de ajuda,', md.bold(message.from_user.full_name), '?'),
-                md.text('\n'),
-                md.text('Segue uma lista de comandos que você pode usar:'),
-                md.text('\n'),
-                md.text('🥰 /ack @nomedapessoa Mensagem de gratidaum'),
-                md.text('       📜 Envia gratidaum para a pessoa selecionada.'),
-                md.text('🤔 /help ou /ajuda'),
-                md.text('       📜 Esse menu de ajuda'),
-                md.text('\n'),
-                md.link('🤖 Inicie a configuração CLICANDO AQUI 🤖', start_link_setup),
-                md.text('\n'),
-                md.text(md.bold('OBS:'), 'Nunca compartilhe sua senha com ninguém, e a guarde em lugar seguro.'),
-                sep='\n',
-            ),
-            parse_mode=ParseMode.MARKDOWN,
+            md.text(_('Precisa de ajuda, <b>{full_name}</b>?\n'
+                      'Segue uma lista de comandos que você pode usar:\n\n'
+                      '🥰 /ack @nomedapessoa Mensagem de gratidaum\n'
+                      '       📜 Envia gratidaum para a pessoa selecionada.\n'
+                      '🤔 /help ou /ajuda\n'
+                      '       📜 Esse menu de ajuda\n\n' +
+                      '<a href="{start_link_setup}" >🤖 Inicie a configuração CLICANDO AQUI 🤖</a>\n\n'
+                      '<b>OBS:</b> Nunca compartilhe sua senha com ninguém, e a guarde em lugar seguro.'
+                      ).format(full_name=message.from_user.full_name, start_link_setup=start_link_setup), sep='\n'),
+            parse_mode=ParseMode.HTML,
         )
 
     except Exception as e:
@@ -119,8 +132,8 @@ async def start_redirect_help(message: types.Message):
     await help_handler(message)
 
 
-def build_qr_msg(json, to_who=None):
-    link_wallet = f'https://eosio.to/{json["esr"][6:]}'
+def build_qr_msg(json_eosio, to_who=None):
+    link_wallet = f'https://eosio.to/{json_eosio["esr"][6:]}'
     to = to_who if to_who else 'a pessoa'
     return \
         f"🥳 Sua Gratidaum está quase chegando para {to} 🎉\n\n" \
@@ -130,7 +143,7 @@ def build_qr_msg(json, to_who=None):
         f'{md.hlink("Confirme o envio da Gratidaum", link_wallet)}\n\n' \
         f'Ou\n\n' \
         f"Escaneie o QR Code para confirmar a transação\n" \
-        f"{md.hide_link(json['qr'])}\n\n" \
+        f"{md.hide_link(json_eosio['qr'])}\n\n" \
         f'Em casos de dúvidas digite /ajuda'
 
 
@@ -230,21 +243,30 @@ async def process_username(message: types.Message, state: FSMContext):
             name = message.from_user.full_name if not message.from_user.username else message.from_user.username
             try:
                 with db.transaction():
-                    has_user = User.get_or_none(name=name)
+                    has_user = User.get_or_none(user_id=message.from_user.id)
                     if has_user:
-                        logging.info(f" user updated {has_user}")
-
                         has_user.username = message.text
+                        # has_user.user_id = message.from_user.id
                         has_user.updated_date = datetime.now()
                         has_user.save()
+                        logging.info(f" user updated by user_id {has_user}")
                     else:
-                        user_id = (User.insert(
-                            name=name,
-                            username=message.text,
-                            created_date=datetime.now(),
-                            updated_date=datetime.now())
-                                   .execute())
-                        logging.info(f"UserID upserted: {user_id}")
+                        has_user = User.get_or_none(name=name)
+                        if has_user:
+                            has_user.username = message.text
+                            has_user.user_id = message.from_user.id
+                            has_user.updated_date = datetime.now()
+                            has_user.save()
+                            logging.info(f" user updated by name {model_to_dict(has_user)}")
+                        else:
+                            user_id = (User.insert(
+                                name=name,
+                                username=message.text,
+                                user_id=message.from_user.id,
+                                created_date=datetime.now(),
+                                updated_date=datetime.now())
+                                       .execute())
+                            logging.info(f"UserID upserted: {user_id}")
 
                 # And send message
                 await bot.send_message(
@@ -280,7 +302,13 @@ async def process_username(message: types.Message, state: FSMContext):
         logging.error(traceback.format_exc())
 
 
-# await message.reply("Tudo certo!!\nAgora você já pode enviar Gratidaum!")
+def get_user_id(message):
+    user_id = None
+    for msgEntity in message.entities:
+        if msgEntity.type == MessageEntityType.TEXT_MENTION and msgEntity.user:
+            user_id = msgEntity.user.id
+            break
+    return user_id
 
 
 @dp.message_handler(commands=['ack', 'gratz'])
@@ -298,22 +326,30 @@ async def ack(message: types.Message):
             who = args[0] if len(args) > 0 else None
             memo = args[1] if len(args) > 1 else None
 
+            user_id = get_user_id(message)
+
             if who is None:
                 await bot.send_message(message.chat.id, f"Use /ack @nome Escreva seu Agradecimento")
+            elif not user_id:
+                await bot.send_message(message.chat.id, f"Pessoa com nome {who} não encontrada.")
             else:
                 who = who.split('@')
                 who = who[len(who) - 1]
-            has_user = User.get_or_none(name=who)
+
+            has_user = User.get_or_none(user_id=user_id)
+
+            if not has_user:
+                has_user = User.get_or_none(name=who)
 
             if has_user:
-                msg = f"{message.from_user.get_mention()} envia Gratidaum para {who} - {memo if memo else ''}"
+                msg = f"{message.from_user.get_mention()} envia Gratidaum para {who}{f' - {memo}' if memo else ''}"
                 # Reply to chat origin the Gratidaum sent
                 await bot.send_message(message.chat.id, msg, parse_mode=ParseMode.MARKDOWN)
                 logging.info(msg)
                 # CallAPI Hypha and create QRCODE and Link to sign transaction
-                json = await api_get(account=f"{has_user.username}", memo=memo)
-                logging.info(json)
-                res = build_qr_msg(json, who)
+                json_eosio = await api_get(account=f"{has_user.username}", memo=memo)
+                logging.info(json_eosio)
+                res = build_qr_msg(json_eosio, who)
                 logging.info(res)
                 await bot.send_message(message.from_user.id, res, parse_mode=ParseMode.HTML,
                                        disable_web_page_preview=False)
