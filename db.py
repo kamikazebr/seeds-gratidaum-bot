@@ -19,6 +19,7 @@ class User(BaseModel):
     user_id = CharField()
     name = CharField()
     username = CharField()
+    locale = CharField()
     created_date = DateTimeField()
     updated_date = DateTimeField()
 

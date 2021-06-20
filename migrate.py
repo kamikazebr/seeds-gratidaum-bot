@@ -60,5 +60,34 @@ def migrate1():
         log.warning(f"Propably already updated => Error {e}")
 
 
+def migrate2():
+    if current_version_db > 1:
+        log.info("Already applied, ignore")
+        return
+
+    locale = CharField(null=True)
+
+    user_table_name = "user"
+
+    try:
+        log.info(f"We'll start migrating")
+
+        with db.atomic():
+            all_completed = migrate_non_stop(
+                migrator.alter_add_column(user_table_name, nameof(locale), locale),
+            )
+            if all_completed:
+                log.info(f"Done migrate")
+                try:
+                    DBVersion.create()
+                except Exception as e:
+                    log.error(f"Some error try update DBVersion Table => Error {e}")
+            else:
+                log.info(f"Maybe already done that")
+    except Exception as e:
+        log.warning(f"Propably already updated => Error {e}")
+
+
 def start_migration():
     migrate1()
+    migrate2()
