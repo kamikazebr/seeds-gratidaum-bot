@@ -50,12 +50,12 @@ def migrate1():
             )
             if all_completed:
                 log.info(f"Done migrate")
-                try:
-                    DBVersion.create()
-                except Exception as e:
-                    log.error(f"Some error try update DBVersion Table => Error {e}")
             else:
                 log.info(f"Maybe already done that")
+            try:
+                DBVersion.create()
+            except Exception as e:
+                log.error(f"Some error try update DBVersion Table => Error {e}")
     except Exception as e:
         log.warning(f"Propably already updated => Error {e}")
 
