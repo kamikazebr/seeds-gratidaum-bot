@@ -89,17 +89,21 @@ async def send_msg_father(msg):
 
 def build_qr_msg(json_eosio, to_who=None):
     link_wallet = f'https://eosio.to/{json_eosio["esr"][6:]}'
-    to = to_who if to_who else 'a pessoa'
-    return \
-        f"🥳 Sua Gratidaum está quase chegando para {to} 🎉\n\n" \
-        f"Você precisa confirmar a transação.\n" \
-        f"Você tem 2 opções:\n\n" \
-        f'Clique no link abaixo para usar Seeds Wallet/Anchor\n' \
-        f'{md.hlink("Confirme o envio da Gratidaum", link_wallet)}\n\n' \
-        f'Ou\n\n' \
-        f"Escaneie o QR Code para confirmar a transação" \
-        f"{md.hide_link(json_eosio['qr'])}" \
-        f'Em casos de dúvidas digite /ajuda'
+    link_confirm_transaction = md.hlink(_("Confirme o envio da Gratidaum"), link_wallet)
+    qr_code = md.hide_link(json_eosio['qr'])
+    to = to_who if to_who else _('a pessoa')
+    return _("🥳 Sua Gratidaum está quase chegando para {to} 🎉\n\n"
+             "Você precisa confirmar a transação.\n"
+             "Você tem 2 opções:\n\n"
+             'Clique no link abaixo para assinar com Seeds Wallet/Anchor\n'
+             '{link_confirm_transaction}\n\n'
+             'Ou\n\n'
+             "Escaneie o QR Code para confirmar a transação"
+             "{qr_code}\n"
+             'Em casos de dúvidas digite /ajuda').format(
+        to=to,
+        qr_code=qr_code,
+        link_confirm_transaction=link_confirm_transaction)
 
 
 async def start_redirect_help(message: types.Message):
@@ -490,14 +494,15 @@ async def ack(message: types.Message):
 
             else:
                 start_link_setup = await get_start_link('setup')
-                link_setup_html = md.hlink(_('🤖 Peça que a pessoa inicie a configuração CLICANDO AQUI 🤖'), start_link_setup)
+                link_setup_html = md.hlink(_('🤖 Peça que a pessoa inicie a configuração CLICANDO AQUI 🤖'),
+                                           start_link_setup)
                 await bot.send_message(message.chat.id, md.text(
                     _("Não encontramos essa pessoa de nome <b>{who}</b> "
                       "talvez seja necessário essa pessoa se registrar.\n\n"
                       "{link_setup_html}").format(who=who, link_setup_html=link_setup_html),
                     sep='\n',
                 ), parse_mode=ParseMode.HTML)
-                logging.info(_("Esse usuario não foi encontrado no DB {who}").format(who=who))
+                logging.info(f"Esse usuario não foi encontrado no DB {who}")
         else:
             await bot.send_message(message.chat.id, _("Use /ack @nome agradecimento"))
 

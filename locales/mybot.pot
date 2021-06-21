@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-06-20 14:56-0300\n"
+"POT-Creation-Date: 2021-06-20 22:04-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,13 +17,37 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.1\n"
 
-#: webhook_server.py:125 webhook_server.py:290
+#: webhook_server.py:92
+msgid "Confirme o envio da Gratidaum"
+msgstr ""
+
+#: webhook_server.py:94
+msgid "a pessoa"
+msgstr ""
+
+#: webhook_server.py:95
+msgid ""
+"🥳 Sua Gratidaum está quase chegando para {to} 🎉\n"
+"\n"
+"Você precisa confirmar a transação.\n"
+"Você tem 2 opções:\n"
+"\n"
+"Clique no link abaixo para assinar com Seeds Wallet/Anchor\n"
+"{link_confirm_transaction}\n"
+"\n"
+"Ou\n"
+"\n"
+"Escaneie o QR Code para confirmar a transação{qr_code}\n"
+"Em casos de dúvidas digite /ajuda"
+msgstr ""
+
+#: webhook_server.py:129 webhook_server.py:294
 msgid ""
 "<b>OBS:</b> Nunca compartilhe sua senha com ninguém, e a guarde em lugar "
 "seguro."
 msgstr ""
 
-#: webhook_server.py:126
+#: webhook_server.py:130
 msgid ""
 "Precisa de ajuda, <b>{full_name}</b>?\n"
 "Segue uma lista de comandos que você pode usar:\n"
@@ -39,11 +63,11 @@ msgid ""
 "{msg_footer}"
 msgstr ""
 
-#: webhook_server.py:150
+#: webhook_server.py:154
 msgid "Idioma Português selecionado."
 msgstr ""
 
-#: webhook_server.py:296
+#: webhook_server.py:300
 msgid ""
 "Olá Prazer em te conhecer,<b>{full_name}</b>\n"
 "\n"
@@ -57,11 +81,11 @@ msgid ""
 "{msg_footer}"
 msgstr ""
 
-#: webhook_server.py:306
+#: webhook_server.py:310
 msgid "Qual seu username do SEEDS?"
 msgstr ""
 
-#: webhook_server.py:313
+#: webhook_server.py:317
 msgid ""
 "Olá novamente,<b>{full_name}</b>\n"
 "\n"
@@ -72,44 +96,44 @@ msgid ""
 "{msg_footer}"
 msgstr ""
 
-#: webhook_server.py:323
+#: webhook_server.py:327
 msgid "Qual o novo username do SEEDS?"
 msgstr ""
 
-#: webhook_server.py:346
+#: webhook_server.py:350
 msgid "Cancelado."
 msgstr ""
 
-#: webhook_server.py:357
+#: webhook_server.py:361
 msgid ""
 "Oh Não! Isso não é um username válido. Vamos tentar novamente.\n"
 "Qual seu username do SEEDS? (Ex: felipenseeds)"
 msgstr ""
 
-#: webhook_server.py:401
+#: webhook_server.py:405
 msgid ""
 "Muito bem <b>{full_name}</b>!\n"
 "Seu username do SEEDS: <b>{username}</b>\n"
 "Agora você já pode enviar e receber Gratidaum!"
 msgstr ""
 
-#: webhook_server.py:416
+#: webhook_server.py:420
 msgid "Ops. Algo deu errado"
 msgstr ""
 
-#: webhook_server.py:461
+#: webhook_server.py:465
 msgid "Use /ack @nome Escreva seu Agradecimento"
 msgstr ""
 
-#: webhook_server.py:476
+#: webhook_server.py:480
 msgid "{user_mention} envia Gratidaum para {who} {memo}"
 msgstr ""
 
-#: webhook_server.py:493
+#: webhook_server.py:497
 msgid "🤖 Peça que a pessoa inicie a configuração CLICANDO AQUI 🤖"
 msgstr ""
 
-#: webhook_server.py:495
+#: webhook_server.py:500
 msgid ""
 "Não encontramos essa pessoa de nome <b>{who}</b> talvez seja necessário "
 "essa pessoa se registrar.\n"
@@ -117,15 +141,11 @@ msgid ""
 "{link_setup_html}"
 msgstr ""
 
-#: webhook_server.py:500
-msgid "Esse usuario não foi encontrado no DB {who}"
-msgstr ""
-
-#: webhook_server.py:502
+#: webhook_server.py:507
 msgid "Use /ack @nome agradecimento"
 msgstr ""
 
-#: webhook_server.py:514
+#: webhook_server.py:519
 msgid "Ops! Eu não conheço esse comando: [{command}]."
 msgstr ""
 
