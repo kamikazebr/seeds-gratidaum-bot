@@ -23,7 +23,7 @@ from aiohttp import web
 from playhouse.shortcuts import model_to_dict
 
 from api import api_get
-from db import db, User
+from db import db, User, DBVersion
 from helpers import strip_html
 from i18n_user_middleware import I18nUserMiddleware
 from migrate import start_migration

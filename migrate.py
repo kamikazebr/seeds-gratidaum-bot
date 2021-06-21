@@ -10,6 +10,7 @@ log = logging.getLogger("migrate")
 current_version_db = DBVersion.select().count()
 
 log.info(f"current_version_db={current_version_db}")
+
 migrator = SqliteMigrator(db)
 
 
