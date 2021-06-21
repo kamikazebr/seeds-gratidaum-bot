@@ -8,7 +8,8 @@ db = None
 
 DATABASE_URL = os.getenv('DATABASE_URL', None)
 try:
-    if not DATABASE_URL:
+    # logging.error(f"DATABASE_URL: {DATABASE_URL}")
+    if DATABASE_URL:
         full = DATABASE_URL.split("//")[1]
         [part1, part2] = full.split("@")
         [USER, PASSWORD] = part1.split(":")
