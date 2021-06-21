@@ -30,7 +30,7 @@ from migrate import start_migration
 
 logging.basicConfig(level=logging.INFO)
 
-APP_VERSION = 0.5
+APP_VERSION = 0.6
 
 API_TOKEN = os.getenv("API_TOKEN")
 CHAT_ID_FATHER = os.getenv("CHAT_ID_FATHER", None)
@@ -39,7 +39,7 @@ if not CHAT_ID_FATHER:
     logging.warning(f"Chat ID FATHER is not present, check your CHAT_ID_FATHER env variables")
 
 # webhook settings
-WEBHOOK_HOST = os.getenv("WEBHOOK_HOST") if os.getenv("WEBHOOK_HOST") else 'https://c2da1c477408.ngrok.io'
+WEBHOOK_HOST = os.getenv("WEBHOOK_HOST") if os.getenv("WEBHOOK_HOST") else 'https://39626b8389f8.ngrok.io'
 WEBHOOK_PATH = '/api/bot/webhook'
 WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
 
@@ -90,20 +90,24 @@ async def send_msg_father(msg):
 def build_qr_msg(json_eosio, to_who=None):
     link_wallet = f'https://eosio.to/{json_eosio["esr"][6:]}'
     link_confirm_transaction = md.hlink(_("Confirme o envio da Gratidaum"), link_wallet)
-    qr_code = md.hide_link(json_eosio['qr'])
+    # qr_code = md.hlink('QRCode', json_eosio['qr'])
+    # qr_code = md.hlink('QRCode', json_eosio['qr'])
+    # qr_code = md.hide_link(json_eosio['qr'])
+
     to = to_who if to_who else _('a pessoa')
-    return _("🥳 Sua Gratidaum está quase chegando para {to} 🎉\n\n"
-             "Você precisa confirmar a transação.\n"
-             "Você tem 2 opções:\n\n"
-             'Clique no link abaixo para assinar com Seeds Wallet/Anchor\n'
-             '{link_confirm_transaction}\n\n'
-             'Ou\n\n'
-             "Escaneie o QR Code para confirmar a transação"
-             "{qr_code}\n"
-             'Em casos de dúvidas digite /ajuda').format(
+    msg_sign = _("🥳 Sua Gratidaum está quase chegando para {to} 🎉\n\n"
+                 "Você precisa confirmar a transação.\n"
+                 "Você tem 2 opções:\n\n"
+                 'Clique no link abaixo para assinar com Seeds Wallet/Anchor\n'
+                 '{link_confirm_transaction}\n\n'
+                 'Ou\n\n'
+                 "Escaneie o QR Code abaixo para assinar a transação\n").format(
         to=to,
-        qr_code=qr_code,
         link_confirm_transaction=link_confirm_transaction)
+
+    qr_code = md.text(md.text("QRCODE", md.hide_link(json_eosio['qr'])), sep="\n")
+    logging.info(f"qr_code: {qr_code}")
+    return msg_sign, qr_code
 
 
 async def start_redirect_help(message: types.Message):
@@ -458,7 +462,8 @@ async def ack(message: types.Message):
                 memo = message.text[msg_entity.offset + msg_entity.length:]
 
             logging.debug(f"Memo before strip_html: {memo}")
-            memo = strip_html(memo)
+            if memo:
+                memo = strip_html(memo)
             logging.debug(f"Memo after strip_html: {memo}")
 
             if who is None:
@@ -487,10 +492,11 @@ async def ack(message: types.Message):
                 # CallAPI Hypha and create QRCODE and Link to sign transaction
                 json_eosio = await api_get(account=f"{has_user.username}", memo=memo)
                 logging.info(json_eosio)
-                res = build_qr_msg(json_eosio, who)
-                logging.info(res)
-                await bot.send_message(message.from_user.id, res, parse_mode=ParseMode.HTML,
-                                       disable_web_page_preview=False)
+                msg_sign, qr_code = build_qr_msg(json_eosio, who)
+                logging.info(msg_sign)
+
+                await bot.send_message(message.from_user.id, msg_sign, parse_mode=ParseMode.HTML)
+                await bot.send_message(message.from_user.id, qr_code, parse_mode=ParseMode.HTML)
 
             else:
                 start_link_setup = await get_start_link('setup')

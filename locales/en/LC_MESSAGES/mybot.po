@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-06-20 22:04-0300\n"
-"PO-Revision-Date: 2021-06-20 22:06-0300\n"
+"POT-Creation-Date: 2021-06-20 22:46-0300\n"
+"PO-Revision-Date: 2021-06-20 22:46-0300\n"
 "Last-Translator: \n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -23,11 +23,11 @@ msgstr ""
 msgid "Confirme o envio da Gratidaum"
 msgstr "Confirm the sending of Gratidaum"
 
-#: webhook_server.py:94
+#: webhook_server.py:97
 msgid "a pessoa"
 msgstr "a person"
 
-#: webhook_server.py:95
+#: webhook_server.py:98
 msgid ""
 "🥳 Sua Gratidaum está quase chegando para {to} 🎉\n"
 "\n"
@@ -39,8 +39,7 @@ msgid ""
 "\n"
 "Ou\n"
 "\n"
-"Escaneie o QR Code para confirmar a transação{qr_code}\n"
-"Em casos de dúvidas digite /ajuda"
+"Escaneie o QR Code abaixo para assinar a transação\n"
 msgstr ""
 "🥳 Gratitude is almost coming to {to} 🎉\n"
 "\n"
@@ -52,10 +51,9 @@ msgstr ""
 "\n"
 "or\n"
 "\n"
-"Scan the QR Code to confirm the transaction{qr_code}\n"
-"In case of questions type /help"
+"Scan the QR Code below to sign the transaction\n"
 
-#: webhook_server.py:129 webhook_server.py:294
+#: webhook_server.py:133 webhook_server.py:298
 msgid ""
 "<b>OBS:</b> Nunca compartilhe sua senha com ninguém, e a guarde em lugar "
 "seguro."
@@ -63,7 +61,7 @@ msgstr ""
 "<b>PS:</b> Never share your password with anyone, and keep it in safe "
 "place."
 
-#: webhook_server.py:130
+#: webhook_server.py:134
 msgid ""
 "Precisa de ajuda, <b>{full_name}</b>?\n"
 "Segue uma lista de comandos que você pode usar:\n"
@@ -90,11 +88,11 @@ msgstr ""
 "\n"
 "{msg_footer}"
 
-#: webhook_server.py:154
+#: webhook_server.py:158
 msgid "Idioma Português selecionado."
 msgstr "Language English selected."
 
-#: webhook_server.py:300
+#: webhook_server.py:304
 msgid ""
 "Olá Prazer em te conhecer,<b>{full_name}</b>\n"
 "\n"
@@ -119,11 +117,11 @@ msgstr ""
 "\n"
 "{msg_footer}"
 
-#: webhook_server.py:310
+#: webhook_server.py:314
 msgid "Qual seu username do SEEDS?"
 msgstr "What's your SEEDS username?"
 
-#: webhook_server.py:317
+#: webhook_server.py:321
 msgid ""
 "Olá novamente,<b>{full_name}</b>\n"
 "\n"
@@ -142,15 +140,15 @@ msgstr ""
 "\n"
 "{msg_footer}"
 
-#: webhook_server.py:327
+#: webhook_server.py:331
 msgid "Qual o novo username do SEEDS?"
 msgstr "What is the new SEEDS username?"
 
-#: webhook_server.py:350
+#: webhook_server.py:354
 msgid "Cancelado."
 msgstr "Cancelled."
 
-#: webhook_server.py:361
+#: webhook_server.py:365
 msgid ""
 "Oh Não! Isso não é um username válido. Vamos tentar novamente.\n"
 "Qual seu username do SEEDS? (Ex: felipenseeds)"
@@ -158,7 +156,7 @@ msgstr ""
 "Oh, no! This is not a valid username. Let's try it again.\n"
 "What's your SEEDS username? (Ex: felipenseeds)"
 
-#: webhook_server.py:405
+#: webhook_server.py:409
 msgid ""
 "Muito bem <b>{full_name}</b>!\n"
 "Seu username do SEEDS: <b>{username}</b>\n"
@@ -168,23 +166,23 @@ msgstr ""
 "Your SEEDS username is : <b>{username}</b>\n"
 "Now you already can send and receive Gratitude!"
 
-#: webhook_server.py:420
+#: webhook_server.py:424
 msgid "Ops. Algo deu errado"
 msgstr "Ops. Something goes wrong"
 
-#: webhook_server.py:465
+#: webhook_server.py:470
 msgid "Use /ack @nome Escreva seu Agradecimento"
 msgstr "Use /ack @nome Write your Thanks"
 
-#: webhook_server.py:480
+#: webhook_server.py:485
 msgid "{user_mention} envia Gratidaum para {who} {memo}"
 msgstr "{user_mention} sends Gratitude to {who} {memo}"
 
-#: webhook_server.py:497
+#: webhook_server.py:503
 msgid "🤖 Peça que a pessoa inicie a configuração CLICANDO AQUI 🤖"
 msgstr "🤖 Ask to person start up configuration CLICKING HERE 🤖"
 
-#: webhook_server.py:500
+#: webhook_server.py:506
 msgid ""
 "Não encontramos essa pessoa de nome <b>{who}</b> talvez seja necessário "
 "essa pessoa se registrar.\n"
@@ -196,11 +194,11 @@ msgstr ""
 "\n"
 "{link_setup_html}"
 
-#: webhook_server.py:507
+#: webhook_server.py:513
 msgid "Use /ack @nome agradecimento"
 msgstr "Use /ack @nome acknowledgment"
 
-#: webhook_server.py:519
+#: webhook_server.py:525
 msgid "Ops! Eu não conheço esse comando: [{command}]."
 msgstr "Oops! I don't know this command: [{command}]."
 
