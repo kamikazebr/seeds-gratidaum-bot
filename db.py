@@ -29,7 +29,7 @@ logging.info(f"{HOST},{USER}")
 if not HOST or not USER or not DBNAME or not PASSWORD:
     raise Exception(f"Must define PG_HOST PG_USER PG_DBNAME PG_PASSWORD [PG_PORT]")
 else:
-    db = PostgresqlDatabase(DBNAME, host=HOST, user=USER, password=PASSWORD)
+    db = PostgresqlDatabase(DBNAME, host=HOST, user=USER, password=PASSWORD, autorollback=True, autocommit=True)
 # except Exception as e:
 #     logging.error(f"Some error with env database: {e}")
 
