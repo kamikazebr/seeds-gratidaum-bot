@@ -23,13 +23,14 @@ from aiohttp import web
 from playhouse.shortcuts import model_to_dict
 
 from api import api_get
-from db import db, User, DBVersion
+from db import db, User
 from helpers import strip_html
 from i18n_user_middleware import I18nUserMiddleware
 from migrate import start_migration
 
 logging.basicConfig(level=logging.INFO)
 
+NGROK_LOCAL = 'https://2496c0eddc85.ngrok.io'
 APP_VERSION = 0.6
 
 API_TOKEN = os.getenv("API_TOKEN")
@@ -39,7 +40,7 @@ if not CHAT_ID_FATHER:
     logging.warning(f"Chat ID FATHER is not present, check your CHAT_ID_FATHER env variables")
 
 # webhook settings
-WEBHOOK_HOST = os.getenv("WEBHOOK_HOST") if os.getenv("WEBHOOK_HOST") else 'https://39626b8389f8.ngrok.io'
+WEBHOOK_HOST = os.getenv("WEBHOOK_HOST") if os.getenv("WEBHOOK_HOST") else NGROK_LOCAL
 WEBHOOK_PATH = '/api/bot/webhook'
 WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
 
@@ -118,7 +119,7 @@ async def start_redirect_help(message: types.Message):
 def get_user_id(message):
     msg_entity = None
     for msgEntity in message.entities:
-        if msgEntity.type == MessageEntityType.TEXT_MENTION and msgEntity.user:
+        if msgEntity.type == MessageEntityType.TEXT_MENTION or msgEntity.type == MessageEntityType.MENTION and msgEntity.user:
             msg_entity = msgEntity
             break
     return msg_entity
@@ -449,17 +450,21 @@ async def ack(message: types.Message):
         first = message.get_args()
 
         if first:
-            # args = first.split(" ", 1)
-            # who = args[0] if len(args) > 0 else None
-            # memo = args[1] if len(args) > 1 else None
+
             who = None
             memo = None
+            user_id = None
 
             msg_entity: Optional[MessageEntity] = get_user_id(message)
-            user_id = msg_entity.user.id
-            if message.text:
-                who = message.text[msg_entity.offset: msg_entity.offset + msg_entity.length]
-                memo = message.text[msg_entity.offset + msg_entity.length:]
+            if msg_entity:
+                user_id = msg_entity.user.id
+                if message.text:
+                    who = message.text[msg_entity.offset: msg_entity.offset + msg_entity.length]
+                    memo = message.text[msg_entity.offset + msg_entity.length:]
+            else:
+                args = first.split(" ", 1)
+                who = args[0] if len(args) > 0 else None
+                memo = args[1] if len(args) > 1 else None
 
             logging.debug(f"Memo before strip_html: {memo}")
             if memo:
@@ -469,8 +474,9 @@ async def ack(message: types.Message):
             if who is None:
                 await bot.send_message(message.chat.id, _("Use /ack @nome Escreva seu Agradecimento"))
             else:
-                who = who.split('@')
-                who = who[len(who) - 1]
+                if who[0] == '@':
+                    who = who[1:]
+                # who = who[len(who) - 1]
 
             has_user = None
             if user_id:

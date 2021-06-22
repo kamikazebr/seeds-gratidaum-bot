@@ -28,6 +28,7 @@ class I18nUserMiddleware(I18nMiddleware):
             message: Message = args[0]
             log.info(f"data: {message}")
             user_id = message['from']['id']
+
             has_user = User.get_or_none(user_id=user_id)
             locale = None
             if has_user:
