@@ -31,7 +31,7 @@ from migrate import start_migration
 logging.basicConfig(level=logging.INFO, force=True)
 
 NGROK_LOCAL = 'https://83f608ef4a8a.ngrok.io'
-APP_VERSION = 0.9
+APP_VERSION = 1.0
 
 API_TOKEN = os.getenv("API_TOKEN")
 CHAT_ID_FATHER = os.getenv("CHAT_ID_FATHER", None)
