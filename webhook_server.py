@@ -526,7 +526,10 @@ async def ack(message: types.Message):
 
 @dp.message_handler()
 async def not_found(message: types.Message):
-    logging.warning("Not found")
+    logging.warning(f"Not found command: [{message.text}]")
+    if message.chat.type != 'private':
+        logging.warning(f"Awnsered in group or channel just ignore msg: [{message.text}]")
+        return
     # Regular request
     await bot.send_message(message.chat.id, _("Ops! Eu não conheço esse comando: [{command}].")
                            .format(command=message.text))
