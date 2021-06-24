@@ -28,10 +28,10 @@ from helpers import strip_html
 from i18n_user_middleware import I18nUserMiddleware
 from migrate import start_migration
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, force=True)
 
-NGROK_LOCAL = 'https://2496c0eddc85.ngrok.io'
-APP_VERSION = 0.7
+NGROK_LOCAL = 'https://83f608ef4a8a.ngrok.io'
+APP_VERSION = 0.9
 
 API_TOKEN = os.getenv("API_TOKEN")
 CHAT_ID_FATHER = os.getenv("CHAT_ID_FATHER", None)
@@ -287,18 +287,24 @@ async def start(message: types.Message):
         await Form.username.set()
         # await Form.language.set()
         try:
-            if message.from_user.username:
+            if message.from_user.id:
+                logging.info(f"start::Looking for user_id: {message.from_user.id}")
+                user = User.get(User.user_id == message.from_user.id)
+            elif message.from_user.username:
+                logging.info(f"start::Looking for username: {message.from_user.username}")
                 user = User.get(User.name == message.from_user.username)
             else:
+                logging.info(f"start::Looking for full_name: {message.from_user.full_name}")
                 user = User.get(User.name == message.from_user.full_name)
         except Exception as e:
-            logging.info(f"UserDoesNotExist just ignore")
+            logging.info(f"User not found=>just ignore")
             logging.error(traceback.format_exc())
             logging.error(e)
 
         msg_footer = _('<b>OBS:</b> Nunca compartilhe sua senha com ninguém, e a guarde em lugar seguro.')
 
         if user is None:
+            logging.info(f"start::user not found show welcome {message.from_user}")
             await bot.send_message(
                 message.chat.id,
                 md.text(

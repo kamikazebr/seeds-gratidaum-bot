@@ -5,7 +5,7 @@ from aiogram.types import Message
 
 from db import User
 
-logging.basicConfig(level=logging.INFO)
+# logging.basicConfig(level=logging.INFO)
 
 log = logging.getLogger("i18n_user")
 
@@ -23,10 +23,7 @@ class I18nUserMiddleware(I18nMiddleware):
         if 'update' not in action \
                 and 'error' not in action \
                 and action.startswith('pre_process'):
-            log.info(f"Locales: {self.locales}")
-            log.info(f"trigger: {action} args: {args}")
             message: Message = args[0]
-            log.info(f"data: {message}")
             user_id = message['from']['id']
 
             has_user = User.get_or_none(user_id=user_id)

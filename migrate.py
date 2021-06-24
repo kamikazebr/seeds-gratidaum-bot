@@ -4,7 +4,7 @@ from playhouse.migrate import *
 from db import db, DBVersion
 from varname import nameof
 
-logging.basicConfig(level=logging.INFO)
+# logging.basicConfig(level=logging.INFO)
 
 log = logging.getLogger("migrate")
 current_version_db = DBVersion.select().count()

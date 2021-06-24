@@ -6,9 +6,12 @@ import datetime
 
 db = None
 
+logging.basicConfig(level=logging.INFO, force=True)
+
+
 DATABASE_URL = os.getenv('DATABASE_URL', None)
 # try:
-logging.error(f"DATABASE_URL: {DATABASE_URL}")
+# logging.info(f"DATABASE_URL: {DATABASE_URL}")
 if DATABASE_URL:
     full = DATABASE_URL.split("//")[1]
     [part1, part2] = full.split("@")
