@@ -326,8 +326,8 @@ async def start(message: types.Message):
                 message.chat.id,
                 md.text(
                     _('Olá novamente,<b>{full_name}</b>\n\n'
-                      'Você já tem uma conta do SEEDS cadastrado com o username: {username}.\n\n'
-                      'Envie "cancel" (sem aspas) a qualquer momento para cancelar\n\n'
+                      'Você já tem uma conta do SEEDS cadastrado com o username: <b>{username}</b>.\n\n'
+                      'Envie "<b>cancel</b>" (sem aspas) a qualquer momento para cancelar\n\n'
                       '{msg_footer}')
                         .format(full_name=message.from_user.full_name,
                                 username=username, msg_footer=msg_footer),
