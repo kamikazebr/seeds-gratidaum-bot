@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Optional
 
 import aiogram.utils.markdown as md
-from aiogram.dispatcher.filters import Text
+from aiogram.dispatcher.filters import Text, ChatTypeFilter
 from aiogram.dispatcher.webhook import DEFAULT_ROUTE_NAME
 from aiogram.utils.deep_linking import get_start_link
 
@@ -15,7 +15,7 @@ from aiogram.contrib.middlewares.logging import LoggingMiddleware
 from aiogram.dispatcher import Dispatcher, FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.types import ParseMode, MessageEntityType, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, \
-    MessageEntity
+    MessageEntity, ChatType
 from aiogram.utils.executor import set_webhook
 import os
 
@@ -30,8 +30,8 @@ from migrate import start_migration
 
 logging.basicConfig(level=logging.INFO, force=True)
 
-NGROK_LOCAL = 'https://83f608ef4a8a.ngrok.io'
-APP_VERSION = 1.0
+NGROK_LOCAL = 'https://c2507d26cde3.ngrok.io'
+APP_VERSION = 1.1
 
 API_TOKEN = os.getenv("API_TOKEN")
 CHAT_ID_FATHER = os.getenv("CHAT_ID_FATHER", None)
@@ -109,11 +109,6 @@ def build_qr_msg(json_eosio, to_who=None):
     qr_code = md.text(md.text("QRCODE", md.hide_link(json_eosio['qr'])), sep="\n")
     logging.info(f"qr_code: {qr_code}")
     return msg_sign, qr_code
-
-
-async def start_redirect_help(message: types.Message):
-    logging.warning(f"Msg in group or channel. Calling Help {message}")
-    await help_handler(message)
 
 
 def get_user_id(message):
@@ -273,13 +268,16 @@ def build_language_keyboard():
     # await message.reply("Hi!\nDo you love aiogram?", )
 
 
-@dp.message_handler(commands=['start', 'borala', 'bora', 'começar'])
+@dp.message_handler(commands=['start', 'borala', 'bora', 'começar'],
+                    chat_type=[ChatType.GROUP, ChatType.SUPERGROUP, ChatType.CHANNEL])
+async def start_redirect_help(message: types.Message):
+    logging.warning(f"Msg in group or channel. Calling Help {message}")
+    await help_handler(message)
+
+
+@dp.message_handler(commands=['start', 'borala', 'bora', 'começar'], chat_type=[ChatType.PRIVATE])
 async def start(message: types.Message):
     try:
-        if message.chat.type != 'private':
-            await start_redirect_help(message)
-            return
-
         logging.info(f"{message.chat.type}")
         logging.warning("Start")
         user = None
@@ -387,6 +385,7 @@ async def process_username(message: types.Message, state: FSMContext):
                     has_user = User.get_or_none(user_id=message.from_user.id)
                     if has_user:
                         has_user.username = message.text
+                        has_user.name = name
                         # has_user.user_id = message.from_user.id
                         has_user.updated_date = datetime.now()
                         has_user.save()
@@ -494,7 +493,7 @@ async def ack(message: types.Message):
             if has_user:
                 # msg = f"{user_mention} envia Gratidaum para {who}{f' - {memo}' if memo else ''}"
 
-                msg = _("{user_mention} envia Gratidaum para {who} {memo}").format(
+                msg = _("{user_mention} envia Gratidaum para <b>{who}</b> {memo}").format(
                     user_mention=message.from_user.get_mention(as_html=True),
                     who=who,
                     memo=memo)

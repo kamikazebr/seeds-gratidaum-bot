@@ -10,6 +10,14 @@ logging.basicConfig(level=logging.INFO, force=True)
 
 
 DATABASE_URL = os.getenv('DATABASE_URL', None)
+
+if not DATABASE_URL:
+    import subprocess
+
+    result = subprocess.run("heroku config:get DATABASE_URL -a seeds-gratidaum-bot".split(" "), capture_output=True,
+                            text=True)
+    DATABASE_URL = result.stdout.strip()
+    logging.info(f"DATABASE_URL: got from heroku config:get")
 # try:
 # logging.info(f"DATABASE_URL: {DATABASE_URL}")
 if DATABASE_URL:
