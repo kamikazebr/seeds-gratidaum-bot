@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2021-06-24 21:00-0300\n"
-"PO-Revision-Date: 2021-06-24 21:00-0300\n"
+"PO-Revision-Date: 2021-07-05 22:35-0600\n"
 "Last-Translator: \n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -21,11 +21,11 @@ msgstr ""
 
 #: webhook_server.py:93
 msgid "Confirme o envio da Gratidaum"
-msgstr "Confirm the sending of Gratidaum"
+msgstr "Confirm the sending of Gratitude"
 
 #: webhook_server.py:98
 msgid "a pessoa"
-msgstr "a person"
+msgstr "to person"
 
 #: webhook_server.py:99
 msgid ""
@@ -77,7 +77,7 @@ msgid ""
 "{msg_footer}"
 msgstr ""
 "Need help, <b>{full_name}</b>?\n"
-"Here a list commands you can use:\n"
+"Here is a list commands you can use:\n"
 "\n"
 "🥰 /ack @person_name Message of gratitude\n"
 "       📜 Send gratitude for the people selected\n"
@@ -106,20 +106,20 @@ msgid ""
 "\n"
 "{msg_footer}"
 msgstr ""
-"Hello Nice to meet you, <b>{full_name}</b>\n"
+"Hello, nice to meet you, <b>{full_name}</b>\n"
 "\n"
-"I'm a <b>robot</b> who's here to help you set up your account\n"
+"I'm a <b>bot</b> who's here to help you set up your account\n"
 "\n"
-"I need to know the <b>username</b> of your SEEDS account so you can "
-"receive <b>Gratitude.</b>\n"
+"I need to know your SEEDS <b>account name</b> so you can receive "
+"<b>Gratitude.</b>\n"
 "\n"
-"Send \"cancel\" (no quotation marks) at any time to cancel\n"
+"Send \"cancel\" (without quotation marks) at any time to cancel\n"
 "\n"
 "{msg_footer}"
 
 #: webhook_server.py:319
 msgid "Qual seu username do SEEDS?"
-msgstr "What's your SEEDS username?"
+msgstr "What's your SEEDS account name?"
 
 #: webhook_server.py:326
 msgid ""
@@ -134,8 +134,8 @@ msgid ""
 msgstr ""
 "Hello again, <b>{full_name}</b>\n"
 "\n"
-"You already have a SEEDS account registered with the username: "
-"<b>{username}</b> .\n"
+"You already have a SEEDS account registered with the name: <b>{username}"
+"</b> .\n"
 "\n"
 "Send \"<b>cancel</b>\" (no quotation marks) at any time to cancel\n"
 "\n"
@@ -143,7 +143,7 @@ msgstr ""
 
 #: webhook_server.py:336
 msgid "Qual o novo username do SEEDS?"
-msgstr "What is the new SEEDS username?"
+msgstr "What is the new SEEDS account name?"
 
 #: webhook_server.py:359
 msgid "Cancelado."
@@ -154,8 +154,8 @@ msgid ""
 "Oh Não! Isso não é um username válido. Vamos tentar novamente.\n"
 "Qual seu username do SEEDS? (Ex: felipenseeds)"
 msgstr ""
-"Oh, no! This is not a valid username. Let's try it again.\n"
-"What's your SEEDS username? (Ex: felipenseeds)"
+"Oh, no! This is not a valid account name. Let's try it again.\n"
+"What's your SEEDS account name? (Ex: felipenseeds)"
 
 #: webhook_server.py:415
 msgid ""
@@ -164,16 +164,16 @@ msgid ""
 "Agora você já pode enviar e receber Gratidaum!"
 msgstr ""
 "Very well <b>{full_name}</b>!\n"
-"Your SEEDS username is : <b>{username}</b>\n"
+"Your SEEDS account name is : <b>{username}</b>\n"
 "Now you already can send and receive Gratitude!"
 
 #: webhook_server.py:430
 msgid "Ops. Algo deu errado"
-msgstr "Ops. Something goes wrong"
+msgstr "Oops. Something went wrong."
 
 #: webhook_server.py:480
 msgid "Use /ack @nome Escreva seu Agradecimento"
-msgstr "Use /ack @nome Write your Thanks"
+msgstr "Use /ack @name acknowledgement"
 
 #: webhook_server.py:496
 msgid "{user_mention} envia Gratidaum para <b>{who}</b> {memo}"
@@ -181,7 +181,7 @@ msgstr "{user_mention} sends Gratitude to <b>{who}</b> {memo}"
 
 #: webhook_server.py:514
 msgid "🤖 Peça que a pessoa inicie a configuração CLICANDO AQUI 🤖"
-msgstr "🤖 Ask to person start up configuration CLICKING HERE 🤖"
+msgstr "🤖 Ask the person to start up configuration CLICKING HERE 🤖"
 
 #: webhook_server.py:517
 msgid ""
@@ -190,14 +190,14 @@ msgid ""
 "\n"
 "{link_setup_html}"
 msgstr ""
-"I'm  not found that person called <b>{who}</b> this person may need to "
+"I cannot find the person called <b>{who}</b>, this person may need to "
 "register.\n"
 "\n"
 "{link_setup_html}"
 
 #: webhook_server.py:524
 msgid "Use /ack @nome agradecimento"
-msgstr "Use /ack @nome acknowledgment"
+msgstr "Use /ack @name acknowledgement"
 
 #: webhook_server.py:539
 msgid "Ops! Eu não conheço esse comando: [{command}]."
