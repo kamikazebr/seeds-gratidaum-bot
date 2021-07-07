@@ -30,8 +30,8 @@ from migrate import start_migration
 
 logging.basicConfig(level=logging.INFO, force=True)
 
-NGROK_LOCAL = 'https://c2507d26cde3.ngrok.io'
-APP_VERSION = 1.1
+NGROK_LOCAL = 'https://6a9f0028c179.ngrok.io'
+APP_VERSION = 1.3
 
 API_TOKEN = os.getenv("API_TOKEN")
 CHAT_ID_FATHER = os.getenv("CHAT_ID_FATHER", None)
@@ -254,6 +254,7 @@ def build_language_keyboard():
     text_and_data = (
         ('🇧🇷 Português 🇧🇷', 'pt'),
         ('🇺🇸 English 🇺🇸', 'en'),
+        ('🇪🇸 Español 🇪🇸', 'es'),
     )
     # in real life for the callback_data the callback data factory should be used
     # here the raw string is used for the simplicity
