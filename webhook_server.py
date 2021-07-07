@@ -480,7 +480,8 @@ async def ack(message: types.Message):
             logging.info(f"Memo after strip_html: {memo}")
 
             if who is None:
-                await bot.send_message(message.chat.id, _("Use /ack @nome Escreva seu Agradecimento"))
+                await message.reply(_("Use /ack @nome Escreva seu Agradecimento"))
+                # await bot.send_message(message.chat.id, _("Use /ack @nome Escreva seu Agradecimento"))
             else:
                 if who[0] == '@':
                     who = who[1:]
