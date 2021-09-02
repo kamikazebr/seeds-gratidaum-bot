@@ -30,8 +30,8 @@ from migrate import start_migration
 
 logging.basicConfig(level=logging.INFO, force=True)
 
-NGROK_LOCAL = 'https://6a9f0028c179.ngrok.io'
-APP_VERSION = 1.3
+NGROK_LOCAL = 'https://1620-170-84-182-230.ngrok.io'
+APP_VERSION = 1.4
 
 API_TOKEN = os.getenv("API_TOKEN")
 CHAT_ID_FATHER = os.getenv("CHAT_ID_FATHER", None)
@@ -476,17 +476,17 @@ async def ack(message: types.Message):
             if memo:
                 memo = strip_html(memo)
             else:
-                memo = ''
+                await message.reply(_("Use /ack @nome Escreva seu Agradecimento"))
+                return
+                # memo = ''
 
             logging.info(f"Memo after strip_html: {memo}")
 
             if who is None:
                 await message.reply(_("Use /ack @nome Escreva seu Agradecimento"))
-                # await bot.send_message(message.chat.id, _("Use /ack @nome Escreva seu Agradecimento"))
             else:
                 if who[0] == '@':
                     who = who[1:]
-                # who = who[len(who) - 1]
 
             has_user = None
             if user_id:
